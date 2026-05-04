@@ -1,0 +1,7 @@
+<title>Тур компании</title>
+<h1>Список компаний</h1>
+{% for company in companies %}
+    <h2>{{ company.name }}</h2>
+    <p>{{ company.description }}</p>
+    <p>Средний рейтинг: {{ company.avg_rating }}</p>
+{% endfor %}
