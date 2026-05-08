@@ -38,10 +38,9 @@ class Person(models.Model):
 
 class Horse(models.Model):
     name = models.CharField(max_length=100)
-    owner = models.OneToOneField(Person, on_delete=models.CASCADE, related_name='horse', null=True)
 
     def __str__(self):
-        return f'{self.name}---{self.owner}'
+        return f'{self.name}'
 
 #OneToMany 
 
@@ -61,4 +60,14 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.company} - {self.marks}"
+    
+class Booking(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='bookings')
+    horse = models.ForeignKey(Horse, on_delete=models.CASCADE, related_name='bookings')
+    company = models.ForeignKey(TourCompany, on_delete=models.CASCADE, related_name='bookings')
+    booking_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.person} - {self.horse} - {self.company}"
 

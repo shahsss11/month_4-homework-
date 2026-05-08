@@ -1,0 +1,6 @@
+<h1>Заполнить форму для записи на конный тур</h1>
+<form action="/create_booking/" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Отправить</button>
+</form>
