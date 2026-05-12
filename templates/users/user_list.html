@@ -1,0 +1,16 @@
+<h1>Список пользователей</h1>
+{% for i in users %}
+    <h2>Привет, {{ i.username }}</h2>
+    <p>Телефон: {{ i.phone }}</p>
+    <p>Возраст: {{ i.age }}</p>
+    <p>Город: {{ i.city }}</p>
+    <p>Образование: {{ i.education }}</p>
+    <p>Навыки: {{ i.skills }}</p>
+    <p>Должность: {{ i.desired_position }}</p>
+    <p>Зарплата: {{ i.salary }}</p>
+    <img src="{{ i.photo.url }}" width="200">
+    <p>
+        <a href="{{ i.resume.url }}">Скачать резюме</a>
+    </p>
+    <hr>
+{% endfor %}
