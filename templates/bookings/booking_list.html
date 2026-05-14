@@ -1,22 +1,31 @@
+{% include 'header.html' %}
 
-<h1>Мои записи на конный тур</h1>
-
-<a href="/create_booking/">Добавить запись</a>
-
-<ul>
-    {% for i in booking %}
-
-    <li>
-        <h2>Имя: {{ i.person.name }}</h2>
-        <p>Лошадь: {{ i.horse.name }}</p>
-        <p>Компания: {{ i.company.name }}</p>
-        <p>Дата тура: {{ i.booking_date }}</p>
-        <p>Дата создания: {{ i.created_at }}</p>
-
-        <button><a href="/booking_list/{{ i.id }}/delete/">Удалить</a></button>
-        <button><a href="/booking_list/{{ i.id }}/update/">Изменить</a></button>
-
-    </li>
-
-    {% endfor %}
-</ul>
+<h1>Конные туры</h1>
+<form method="GET">
+    <input type="text" name="search" placeholder="Поиск по названию">
+    <button type="submit">Найти</button>
+</form>
+<hr>
+{% for booking in page_obj %}
+<h2>{{ booking.company.name }}</h2>
+<p>Лошадь: {{ booking.horse.name }}</p>
+<p>Человек: {{ booking.person.name }}</p>
+<p>Дата: {{ booking.booking_date }}</p>
+<a href="/booking_list/{{ booking.id }}/">Подробнее</a>
+<hr>
+{% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; Первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+        <span class="current">
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>

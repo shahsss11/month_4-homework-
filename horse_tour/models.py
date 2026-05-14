@@ -1,7 +1,7 @@
 from django.db import models
 
 
-#ManyToMany 
+
 class Service(models.Model):
     name = models.CharField(max_length=100)
 
@@ -13,10 +13,6 @@ class TourCompany(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     services = models.ManyToManyField(Service, blank=True)
-    
-    
-    
-
     def avg_rating(self):
         reviews = self.reviews.all()
         if reviews:
@@ -28,7 +24,7 @@ class TourCompany(models.Model):
         return self.name
 
 
-#OneToOne
+
 class Person(models.Model):
     name = models.CharField(max_length=100)
 
@@ -40,12 +36,10 @@ class Horse(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
-#OneToMany 
 
 class Review(models.Model):
-
     class Marks(models.IntegerChoices):
         ONE = 1, '1'
         TWO = 2, '2'
@@ -60,14 +54,16 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.company} - {self.marks}"
-    
+
+
+
 class Booking(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='bookings')
     horse = models.ForeignKey(Horse, on_delete=models.CASCADE, related_name='bookings')
     company = models.ForeignKey(TourCompany, on_delete=models.CASCADE, related_name='bookings')
     booking_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+    views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.person} - {self.horse} - {self.company}"
-
