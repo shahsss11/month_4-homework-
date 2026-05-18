@@ -1,53 +1,55 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.core.paginator import Paginator
-from django.db.models import F
+from django.shortcuts import redirect
+from django.views import generic
 from . import models, forms
 
 
-def update_booking_view(request, id):
-    booking_id = get_object_or_404(models.Booking, id=id)
-    if request.method == 'POST':
-        form = forms.BookingForm(request.POST, instance=booking_id)
-        if form.is_valid():
-            form.save()
-            return redirect('/booking_list/')
-    else:
-        form = forms.BookingForm(instance=booking_id)
-
-    return render(request, 'bookings/update_booking.html', {"form": form,'booking_id': booking_id,})
+class UpdateBookingView(generic.UpdateView):
+    template_name = 'bookings/update_booking.html'
+    form_class = forms.BookingForm
+    model = models.Booking
+    success_url = '/booking_list/'
+    context_object_name = 'booking_id'
 
 
-def delete_booking_view(request, id):
-    booking_id = get_object_or_404(models.Booking, id=id)
-    booking_id.delete()
-    return redirect('/booking_list/')
+class DeleteBookingView(generic.DeleteView):
+    model = models.Booking
+    success_url = '/booking_list/'
 
 
-def create_booking_view(request):
-    if request.method == "POST":
-        form = forms.BookingForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/booking_list/')
-    else:
-        form = forms.BookingForm()
-    return render(request, 'bookings/create_booking.html', {'form': form,})
+class CreateBookingView(generic.CreateView):
+    template_name = 'bookings/create_booking.html'
+    form_class = forms.BookingForm
+    success_url = '/booking_list/'
 
 
-def booking_list_view(request):
-    search = request.GET.get('search', '')
-    bookings = models.Booking.objects.all().order_by('-id')
-    if search:
-        bookings = bookings.filter(company__name__icontains=search)
-    paginator = Paginator(bookings, 3)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'bookings/booking_list.html', {'page_obj': page_obj,'search': search})
+class BookingListView(generic.ListView):
+    template_name = 'bookings/booking_list.html'
+    context_object_name = 'page_obj'
+    model = models.Booking
+    paginate_by = 3
 
-def booking_detail_view(request, id):
-    booking = get_object_or_404(models.Booking, id=id)
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        bookings = self.model.objects.all().order_by('-id')
 
-    booking.views += 1
-    booking.save()
+        if search:
+            bookings = bookings.filter(company__name__icontains=search)
 
-    return render(request, 'bookings/booking_detail.html', {'booking': booking})
+        return bookings
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search', '')
+        return context
+
+
+class BookingDetailView(generic.DetailView):
+    template_name = 'bookings/booking_detail.html'
+    context_object_name = 'booking'
+    model = models.Booking
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.views += 1
+        obj.save()
+        return obj

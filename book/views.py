@@ -1,7 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.http import HttpResponse
-from django.core.paginator import Paginator
-from django.db.models import F
+from django.views import generic
 from .models import Book
 
 
@@ -15,19 +14,32 @@ def quote3(request):
     return HttpResponse("Оскар Уайльд: 'Мы все рождаемся глупыми, но некоторые из нас решают остаться ими.'")
 
 
-def book_list(request):
-    search = request.GET.get('search', '')
-    books = Book.objects.all()
-    if search:
-        books = books.filter(title__icontains=search)
-    paginator = Paginator(books, 3)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'books/book_list.html', {'page_obj': page_obj,'search': search})
+class BookListView(generic.ListView):
+    template_name = 'books/book_list.html'
+    context_object_name = 'page_obj'
+    model = Book
+    paginate_by = 3
+
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        books = self.model.objects.all()
+        if search:
+            books = books.filter(title__icontains=search)
+        return books
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search', '')
+        return context
 
 
-def book_detail(request, id):
-    book = get_object_or_404(Book, id=id)
-    book.views += 1
-    book.save()
-    return render(request, 'books/book_detail.html', {'book': book})
+class BookDetailView(generic.DetailView):
+    template_name = 'books/book_detail.html'
+    context_object_name = 'book'
+    model = Book
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.views += 1
+        obj.save()
+        return obj

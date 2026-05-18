@@ -3,9 +3,9 @@ from . import views
 
 
 urlpatterns = [
-    path('booking_list/', views.booking_list_view, name='bk_list'),
-    path('booking_list/<int:id>/delete/', views.delete_booking_view, name='del_booking'),
-    path('booking_list/<int:id>/update/', views.update_booking_view, name='edit_booking'),
-    path('create_booking/', views.create_booking_view, name='crt_booking'),
-    path('booking_list/<int:id>/', views.booking_detail_view, name='booking_detail')
+    path('booking_list/', views.BookingListView.as_view(), name='bk_list'),
+    path('booking_list/<int:pk>/delete/', views.DeleteBookingView.as_view(), name='del_booking'),
+    path('booking_list/<int:pk>/update/', views.UpdateBookingView.as_view(), name='edit_booking'),
+    path('create_booking/', views.CreateBookingView.as_view(), name='crt_booking'),
+    path('booking_list/<int:pk>/', views.BookingDetailView.as_view(), name='booking_detail')
 ]
